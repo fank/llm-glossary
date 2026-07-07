@@ -2,7 +2,9 @@
 
 Plain-language explanations of terminology from the world of self-hosted LLM inference and serving. Written for someone **without** an LLM/GPU background — each entry says what the thing is and why it matters in practice.
 
-Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are listed in parentheses.
+Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are listed in parentheses. Terms link to a primary source (paper, spec, or docs) where one exists.
+
+**Missing a term, or found a definition unclear or wrong?** [Open an issue](../../issues/new/choose) or send a PR — corrections and suggestions of any size are welcome. Everything here is [CC0 / public domain](LICENSE): use it however you like, no attribution needed.
 
 ---
 
@@ -32,7 +34,7 @@ Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are
 
 ## 2. Model architecture
 
-**Transformer** — The standard neural-network architecture behind modern LLMs. Its core mechanism is **attention** (below). Most terms in this section are variations on it.
+**[Transformer](https://arxiv.org/abs/1706.03762)** — The standard neural-network architecture behind modern LLMs. Its core mechanism is **attention** (below). Most terms in this section are variations on it.
 
 **Attention** — The mechanism that lets the model relate each token to every other token in the context ("which earlier words matter for the next word?"). It is expensive: cost grows with context length, which is why so many variants below exist.
 
@@ -43,21 +45,21 @@ Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are
 - **Routed / shared experts** — Routed experts are chosen per token by the router; shared experts always run.
 - **Expert routing / auxiliary-loss-free routing** (`noaux_tc`, `e_score_correction_bias`, `topk_method`, `scoring_func`) — Config knobs describing *how* the router picks experts (DeepSeek-V3 style). Only matters when a bad config breaks model loading.
 
-**MLA (Multi-head Latent Attention)** — DeepSeek's attention variant that stores a *compressed* version of the attention cache, making long contexts use far less GPU memory (e.g. 122K tokens of context in ~11 GiB instead of many times that).
+**[MLA](https://arxiv.org/abs/2405.04434) (Multi-head Latent Attention)** — DeepSeek's attention variant that stores a *compressed* version of the attention cache, making long contexts use far less GPU memory (e.g. 122K tokens of context in ~11 GiB instead of many times that).
 
-**GQA (Grouped-Query Attention)** — A common attention optimization where several "query heads" share the same "key/value heads", shrinking the KV cache. Most modern non-DeepSeek models use it.
+**[GQA](https://arxiv.org/abs/2305.13245) (Grouped-Query Attention)** — A common attention optimization where several "query heads" share the same "key/value heads", shrinking the KV cache. Most modern non-DeepSeek models use it.
 
 **DSA (DeepSeek Sparse Attention)** — DeepSeek's trick to make attention cheaper on long contexts: a small "**Lightning Indexer**" first picks the top-k most relevant earlier tokens, and full attention is only computed against those. The indexer keeps its own small cache.
 
-**NSA (Native Sparse Attention)** — DeepSeek's earlier published sparse-attention design (same family of ideas as DSA): attend only to a selected subset of tokens instead of all of them, trained natively that way rather than bolted on afterwards.
+**[NSA](https://arxiv.org/abs/2502.11089) (Native Sparse Attention)** — DeepSeek's earlier published sparse-attention design (same family of ideas as DSA): attend only to a selected subset of tokens instead of all of them, trained natively that way rather than bolted on afterwards.
 
 **SWA (Sliding-Window Attention)** — Attention limited to a fixed window of recent tokens (e.g. `sliding_window=128`) instead of the whole context. Cheap, but the layer can't see far back; models mix SWA layers with full-attention layers.
 
 **c4a / c128a** — Shorthand in DeepSeek-V4 for compressed global-attention layers with a per-layer KV compression ratio of 4 or 128 (higher = more compressed = cheaper).
 
-**SSM (State-Space Model) / Mamba / Mamba-2** — An alternative to attention: instead of looking back at all tokens, the layer maintains a running "hidden state" that is updated token by token (like a summary it carries forward). Much cheaper for long contexts. "**Hybrid**" models interleave Mamba/SSM layers with attention layers.
+**SSM (State-Space Model) / [Mamba](https://arxiv.org/abs/2312.00752) / [Mamba-2](https://arxiv.org/abs/2405.21060)** — An alternative to attention: instead of looking back at all tokens, the layer maintains a running "hidden state" that is updated token by token (like a summary it carries forward). Much cheaper for long contexts. "**Hybrid**" models interleave Mamba/SSM layers with attention layers.
 
-**GDN (Gated DeltaNet)** — Qwen's hybrid linear-attention/recurrent layer type (used in ~75% of Qwen3.5/3.6 layers). Like SSMs, it carries a running state — which has practical consequences: the state can't be checkpointed per token, so features like prefix caching and speculative-decoding rollback don't work naturally with it.
+**[GDN](https://arxiv.org/abs/2412.06464) (Gated DeltaNet)** — Qwen's hybrid linear-attention/recurrent layer type (used in ~75% of Qwen3.5/3.6 layers). Like SSMs, it carries a running state — which has practical consequences: the state can't be checkpointed per token, so features like prefix caching and speculative-decoding rollback don't work naturally with it.
 
 **Encoder / decoder** — Two transformer flavors. *Decoders* generate text left-to-right (all chat LLMs). *Encoders* read the whole input at once and output a representation (classic for embeddings, e.g. BERT-style). Matters for embedding models: decoder-based embedders need **last-token pooling** (take the representation of the final token), encoders typically use mean/CLS pooling.
 
@@ -65,7 +67,7 @@ Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are
 
 **Multimodal / vision model** — A model that accepts images as well as text. `--language-model-only` disables the vision part to save memory when only text is needed.
 
-**YaRN** — A technique to stretch a model's context window beyond what it was trained on (e.g. extending to 1M tokens).
+**[YaRN](https://arxiv.org/abs/2309.00071)** — A technique to stretch a model's context window beyond what it was trained on (e.g. extending to 1M tokens).
 
 **CoT (Chain of Thought) / thinking / reasoning** — The model "thinks out loud" before answering, emitting reasoning inside special tags (e.g. `<think>…</think>`). Serving-side knobs: `enable_thinking`, `reasoning_effort`, `thinking_token_budget`. The **reasoning parser** (below) strips this into a separate `reasoning` field so clients don't see it mixed into the answer.
 
@@ -87,7 +89,7 @@ Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are
 
 **KV cache quantization (K vs V separately)** — The cache can be stored in fewer bits, like weights. The two halves are not equally sensitive: **keys** are used to compute attention scores, so quantizing K hurts quality more than quantizing **values** (which are only mixed into the output). llama.cpp therefore lets you set them independently — `-ctk` / `--cache-type-k` and `-ctv` / `--cache-type-v` — and a common recipe is a higher-precision K with a more aggressive V (e.g. K=q8_0, V=q4_0). vLLM's `--kv-cache-dtype` applies one dtype to both.
 
-**PagedAttention / paged KV** — vLLM's core idea: manage KV-cache memory in fixed-size blocks (like OS memory pages) instead of one big contiguous buffer, so memory isn't wasted. `--block-size` sets the block granularity.
+**[PagedAttention](https://arxiv.org/abs/2309.06180) / paged KV** — vLLM's core idea: manage KV-cache memory in fixed-size blocks (like OS memory pages) instead of one big contiguous buffer, so memory isn't wasted. `--block-size` sets the block granularity.
 
 **Prefix caching (APC, Automatic Prefix Caching)** — If many requests share the same beginning (e.g. the same big system prompt), the engine reuses the already-computed KV cache for that shared prefix instead of re-prefilling it. Biggest single latency lever for agent workloads ("6–21× lower TTFT"). Flag: `--enable-prefix-caching`. Doesn't work for layer types that carry running state (GDN/Mamba), since there's no per-token cache to reuse.
 
@@ -105,7 +107,7 @@ Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are
 
 ## 4. Speculative decoding
 
-**Speculative decoding (spec decode)** — A decode speed-up: a small, fast "**drafter**" guesses the next several tokens, then the big model verifies the whole guess in *one* pass. Correct guesses are accepted for free; wrong ones fall back to normal decoding. Output is identical to non-speculative decoding — it's purely faster. Configured with `--speculative-config`; **k** / `num_speculative_tokens` = how many tokens are drafted per step.
+**[Speculative decoding](https://arxiv.org/abs/2211.17192) (spec decode)** — A decode speed-up: a small, fast "**drafter**" guesses the next several tokens, then the big model verifies the whole guess in *one* pass. Correct guesses are accepted for free; wrong ones fall back to normal decoding. Output is identical to non-speculative decoding — it's purely faster. Configured with `--speculative-config`; **k** / `num_speculative_tokens` = how many tokens are drafted per step.
 
 - **Drafter / speculator / draft model** — the small model doing the guessing. **Verifier** — the big model checking.
 - **Acceptance rate / accepted-per-step / eff tok/step** — how many drafted tokens the verifier accepts on average. The whole game: higher acceptance = faster. "42% acceptance, 7.33 length" = of long drafts, on average ~7 tokens survive per step.
@@ -114,9 +116,9 @@ Common methods:
 
 **MTP (Multi-Token Prediction)** — The drafter is a small extra layer *inside* the main model (DeepSeek ships one built-in; Gemma uses a separate `-assistant` drafter checkpoint). No separate model to manage.
 
-**EAGLE / EAGLE3** — A popular family of trained drafter heads that reuse the big model's internal states to draft accurately.
+**[EAGLE](https://arxiv.org/abs/2401.15077) / EAGLE3** — A popular family of trained drafter heads that reuse the big model's internal states to draft accurately.
 
-**Medusa** — An older multi-head drafting method (referenced for comparison).
+**[Medusa](https://arxiv.org/abs/2401.10774)** — An older multi-head drafting method (referenced for comparison).
 
 **DFlash** — A "block-diffusion" drafter (~0.8B, from z-lab): instead of guessing tokens one by one, it drafts a whole block of tokens in a single non-causal forward pass (a "denoising step"), like filling in a whole phrase at once.
 
@@ -140,7 +142,7 @@ Common methods:
 - **W4A16 / W8A8** — shorthand: **W**eights in 4-bit, **A**ctivations in 16-bit, etc.
 - **E8M0** — an 8-bit exponent-only scale format used inside MXFP4.
 
-**GGUF quant types (Q4_0, Q4_1, Q4_K_M, Q8_0, IQ2_XS, …)** — The naming scheme for quantization levels of GGUF files (llama.cpp / Ollama). Reading the name: `Q<bits>_<variant>` — the number is bits per weight, the suffix is *how* the scaling works:
+**[GGUF](https://github.com/ggml-org/ggml/blob/master/docs/gguf.md) quant types (Q4_0, Q4_1, Q4_K_M, Q8_0, IQ2_XS, …)** — The naming scheme for quantization levels of GGUF files (llama.cpp / Ollama). Reading the name: `Q<bits>_<variant>` — the number is bits per weight, the suffix is *how* the scaling works:
 - **Q4_0 / Q5_0 / Q8_0** — the original ("legacy") scheme: weights are grouped in blocks of 32, each block stores one scale factor. Simple, slightly lossier.
 - **Q4_1 / Q5_1** — same, but each block stores a scale *and* an offset (minimum), recovering a bit more accuracy for a bit more size. So Q4_1 ≈ slightly bigger + slightly better than Q4_0.
 - **K-quants (Q3_K, Q4_K, Q5_K, Q6_K)** — the newer scheme: "super-blocks" with smarter, finer-grained scales, and *mixed* precision — important layers get more bits. The **_S / _M / _L** suffix (e.g. **Q4_K_M**) picks small/medium/large within that: how many layers get the higher-precision treatment. Q4_K_M is the common "sweet spot" recommendation.
@@ -152,7 +154,7 @@ Rule of thumb: higher number = better quality + bigger file; at equal bits, IQ >
 
 **Calibration** — For post-training quantization: running sample data through the model to choose good scaling factors. Bad calibration → subtle quality bugs (e.g. a "miscalibrated logit tail" at temperature 1.0).
 
-**Quantization toolkits/formats** — **compressed-tensors (`-ct`)** (checkpoint format used by RedHatAI et al.), **AutoRound** (Intel), **AWQ**, **GPTQ**, **llm-compressor**, **modelopt** (NVIDIA TensorRT ModelOpt), **GGUF** (llama.cpp's file format — see the GGUF quant types above).
+**Quantization toolkits/formats** — **compressed-tensors (`-ct`)** (checkpoint format used by RedHatAI et al.), **AutoRound** (Intel), **[AWQ](https://arxiv.org/abs/2306.00978)**, **[GPTQ](https://arxiv.org/abs/2210.17323)**, **llm-compressor**, **modelopt** (NVIDIA TensorRT ModelOpt), **GGUF** (llama.cpp's file format — see the GGUF quant types above).
 
 ---
 
@@ -162,19 +164,19 @@ HuggingFace is full of community models with long, keyword-stacked names. The pa
 
 **Base model** — The original model everything else is derived from. Community models almost always name their base first, because that determines architecture, tokenizer, and rough capability.
 
-**Fine-tune / finetune** — Taking a base model and training it further on extra data to change its behavior (coding, roleplay, a specific style). Cheap compared to training from scratch; the vast majority of HuggingFace uploads are fine-tunes. Flavors you'll see in cards: **SFT** (supervised fine-tuning — train on example conversations), **DPO/RLHF/GRPO** (preference tuning — train on "this answer is better than that one").
+**Fine-tune / finetune** — Taking a base model and training it further on extra data to change its behavior (coding, roleplay, a specific style). Cheap compared to training from scratch; the vast majority of HuggingFace uploads are fine-tunes. Flavors you'll see in cards: **SFT** (supervised fine-tuning — train on example conversations), **[DPO](https://arxiv.org/abs/2305.18290)/RLHF/GRPO** (preference tuning — train on "this answer is better than that one").
 
-**LoRA / QLoRA** — The cheap way to fine-tune: instead of updating all weights, train a small "adapter" bolted onto them (QLoRA = doing that on top of a quantized model, so it fits on consumer GPUs). Adapters can be shipped separately (a few hundred MB) or merged into the weights before upload.
+**[LoRA](https://arxiv.org/abs/2106.09685) / [QLoRA](https://arxiv.org/abs/2305.14314)** — The cheap way to fine-tune: instead of updating all weights, train a small "adapter" bolted onto them (QLoRA = doing that on top of a quantized model, so it fits on consumer GPUs). Adapters can be shipped separately (a few hundred MB) or merged into the weights before upload.
 
 **Instruct / -it / chat** — A model tuned to follow instructions in a conversation (vs. a raw "base"/"text" model that just continues text). Nearly everything you'd self-host for chat is an instruct model.
 
 **Distillation (distill)** — Training a smaller/cheaper model on the *outputs* of a bigger model so it imitates it. A bigger model's name inside a fine-tune's name (e.g. "R1-Distill", or a Claude/GPT model name) means "trained on data generated by that model", **not** that it contains that model's weights.
 
-**Merge / model merging** — Combining the weights of several fine-tunes of the same base into one model (no training involved, just arithmetic). Popular in the hobbyist scene; quality is hit-or-miss. The standard tool is **mergekit**; method names that show up in cards: **SLERP**, **TIES**, **DARE** / **DARE-TIES**, **Model Stock**, **task arithmetic** — with per-model **weight** and **density** knobs controlling how much each ingredient contributes.
+**Merge / model merging** — Combining the weights of several fine-tunes of the same base into one model (no training involved, just arithmetic). Popular in the hobbyist scene; quality is hit-or-miss. The standard tool is **[mergekit](https://github.com/arcee-ai/mergekit)**; method names that show up in cards: **SLERP**, **TIES**, **DARE** / **DARE-TIES**, **Model Stock**, **task arithmetic** — with per-model **weight** and **density** knobs controlling how much each ingredient contributes.
 
 **Codenames & purpose words in names** — Fantasy words in a name are pure branding — the uploader's name for their recipe, with no standard meaning. Functional words hint at the target use: **Novelist / Writer / Storyteller** = creative prose, **Coder** = programming, **RP** = roleplay. Version tags (`v0.2`, `-preview`) and context tags (`-128K`) mean what they say.
 
-**Uncensored / abliterated / abliteration** — The model's refusal behavior ("I can't help with that") has been removed. *Abliteration* is the common technique: find the internal direction that represents refusal and delete it, no retraining needed. **Heretic** is a popular open-source tool that automates this. Side effect: can make models dumber or less stable.
+**Uncensored / abliterated / abliteration** — The model's refusal behavior ("I can't help with that") has been removed. *[Abliteration](https://huggingface.co/blog/mlabonne/abliteration)* is the common technique: find the internal direction that represents refusal and delete it, no retraining needed. **[Heretic](https://github.com/p-e-w/heretic)** is a popular open-source tool that automates this. Side effect: can make models dumber or less stable.
 
 **Frankenmodel / upscaling / parameter expansion** — Making a model *bigger* than its base by duplicating/stacking layers, then (sometimes) healing it with more training (e.g. a 27B base sold as "40B"). The extra parameters are not new knowledge — treat capability claims skeptically.
 
@@ -200,7 +202,7 @@ Rule of thumb: the longer the name, the further the model is from anything valid
 
 **EP (Expert Parallelism)** — For MoE models: splitting the experts across GPUs.
 
-**NCCL** — NVIDIA's library for GPU-to-GPU communication (used by all the above). An **all-reduce** is its core operation: combining partial results from all GPUs (Ring/Tree = its algorithms). vLLM variants: **custom all-reduce** (fast path over NVLink peer-to-peer), **PYNCCL**, **P2P** (direct GPU-to-GPU memory access).
+**[NCCL](https://developer.nvidia.com/nccl)** — NVIDIA's library for GPU-to-GPU communication (used by all the above). An **all-reduce** is its core operation: combining partial results from all GPUs (Ring/Tree = its algorithms). vLLM variants: **custom all-reduce** (fast path over NVLink peer-to-peer), **PYNCCL**, **P2P** (direct GPU-to-GPU memory access).
 
 **torchrun** — PyTorch's launcher for multi-GPU/multi-node jobs.
 
@@ -227,7 +229,7 @@ Rule of thumb: the longer the name, the further the model is from anything valid
 **Kernel** — A small program that runs on the GPU (a matrix multiply, an attention step). Fast serving is mostly about having fast kernels for your exact GPU + number format.
 
 - **GEMM** — general matrix multiply, the workhorse kernel.
-- **CUTLASS / FlashInfer / FlashAttention (flash_attn) / Marlin / Triton / TileLang / CuteDSL / TRT-LLM kernels** — kernel libraries/backends. vLLM picks among them (`--attention-backend`, `moe_backend`); mismatches cause real incompatibilities (e.g. DFlash needs FLASH_ATTN but fp8 KV needs FLASHINFER). **Marlin** also does fast on-the-fly dequantization of 4-bit weights on GPUs without native FP4.
+- **CUTLASS / FlashInfer / [FlashAttention](https://arxiv.org/abs/2205.14135) (flash_attn) / Marlin / Triton / TileLang / CuteDSL / TRT-LLM kernels** — kernel libraries/backends. vLLM picks among them (`--attention-backend`, `moe_backend`); mismatches cause real incompatibilities (e.g. DFlash needs FLASH_ATTN but fp8 KV needs FLASHINFER). **Marlin** also does fast on-the-fly dequantization of 4-bit weights on GPUs without native FP4.
 - **PTX / NVVM / NVCC / CUDA** — NVIDIA's GPU assembly / compiler / toolchain underneath everything.
 
 **cudagraph (CUDA graph) / `--enforce-eager`** — Recording a whole GPU step once and replaying it, removing per-step launch overhead. `--enforce-eager` disables this (slower, but works around capture bugs). **torch.compile / `-O3`** — PyTorch's compiler producing fused, optimized kernels at startup.
@@ -270,11 +272,11 @@ Rule of thumb: the longer the name, the further the model is from anything valid
 
 ## 11. Serving engines & runtimes
 
-**vLLM** — The most widely used open-source LLM serving engine for GPUs. Known for PagedAttention, continuous batching, and an OpenAI-compatible API. Fast-moving; production setups often pin specific builds/nightlies.
+**[vLLM](https://docs.vllm.ai)** — The most widely used open-source LLM serving engine for GPUs. Known for PagedAttention, continuous batching, and an OpenAI-compatible API. Fast-moving; production setups often pin specific builds/nightlies.
 
-**SGLang** — A competing GPU serving engine, notable for its speculative-decoding implementation ("Spec V2").
+**[SGLang](https://docs.sglang.ai)** — A competing GPU serving engine, notable for its speculative-decoding implementation ("Spec V2").
 
-**llama.cpp** — A lightweight C++ inference engine, great on CPU; uses GGUF files.
+**[llama.cpp](https://github.com/ggml-org/llama.cpp)** — A lightweight C++ inference engine, great on CPU; uses GGUF files.
 
 **Infinity** — A Python (torch/optimum) embedding server, commonly used for CPU embedding serving.
 
@@ -284,7 +286,7 @@ Rule of thumb: the longer the name, the further the model is from anything valid
 
 **OpenAI-compatible API** — The de-facto standard HTTP API shape (`/v1/chat/completions`, `/v1/embeddings`); most engines speak it so any OpenAI client works against self-hosted models.
 
-**LiteLLM** — A proxy/router that presents many backends behind one OpenAI-style API with keys and quotas (commonly paired with chat UIs like LibreChat).
+**[LiteLLM](https://docs.litellm.ai)** — A proxy/router that presents many backends behind one OpenAI-style API with keys and quotas (commonly paired with chat UIs like LibreChat).
 
 **fastsafetensors / runai_streamer / safetensors** — **safetensors** is the standard safe weight-file format; the other two are fast loaders that stream weights into GPU memory at startup (model load takes minutes otherwise).
 
@@ -296,7 +298,7 @@ Rule of thumb: the longer the name, the further the model is from anything valid
 
 **Kubernetes (K8s)** — The container-orchestration system underneath. Relevant vocabulary: **pod** (running container instance), **PVC** (persistent volume claim — a chunk of storage, e.g. for model weights), **RWX** (storage mountable by many pods at once), **hostPath** (mounting a node directory — often forbidden by cluster policy), **/dev/shm** (shared-memory filesystem pods use for inter-process communication), **CRD** (custom resource definition — a K8s API extension), **Kyverno** (a policy engine that enforces/mutates cluster rules).
 
-**KServe** — The model-serving framework on PCAI. An **InferenceService (isvc)** is one deployed model (with its URL and bearer-token **JWT** auth); a **ServingRuntime** defines the container/args used to run it; **autoscaling/replicas** control how many copies run.
+**[KServe](https://kserve.github.io/website/)** — The model-serving framework on PCAI. An **InferenceService (isvc)** is one deployed model (with its URL and bearer-token **JWT** auth); a **ServingRuntime** defines the container/args used to run it; **autoscaling/replicas** control how many copies run.
 
 **MLIS** — PCAI's model-inventory API (`/api/v1/models`). Important nuance: it lists model *definitions*, not what is actually running right now.
 
@@ -312,7 +314,7 @@ Rule of thumb: the longer the name, the further the model is from anything valid
 
 ## 13. Monitoring & benchmarking
 
-**Prometheus / `/metrics` / scrape** — The standard metrics pipeline: services expose numbers at `/metrics`; Prometheus "scrapes" (fetches) them periodically. vLLM exposes KV-cache usage, request counts, etc. there.
+**[Prometheus](https://prometheus.io/docs/introduction/overview/) / `/metrics` / scrape** — The standard metrics pipeline: services expose numbers at `/metrics`; Prometheus "scrapes" (fetches) them periodically. vLLM exposes KV-cache usage, request counts, etc. there.
 
 **Grafana / Grafana Cloud / Alloy** — Dashboards for those metrics; **Alloy** is the collector agent that scrapes and forwards them (config blocks like `prometheus.scrape`, `bearer_token_file`).
 
