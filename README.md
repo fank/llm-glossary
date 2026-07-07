@@ -137,10 +137,11 @@ Common methods:
 **Number formats** —
 - **BF16 / FP16** — 16-bit floats; the "full quality" baseline for inference.
 - **FP8** — 8-bit float; halves memory vs 16-bit with usually negligible quality loss. A common default for serving big models.
-- **FP4 / NVFP4 / MXFP4 (e2m1)** — 4-bit float formats (NVFP4 = NVIDIA's, with per-16-value scaling; e2m1 = the bit layout). Very small, but quality risk is significant — blamed for one model's degraded output.
+- **FP4 (e2m1)** — 4-bit float; e2m1 is the bit layout (2 exponent, 1 mantissa bit). Very small, but quality risk is significant — blamed for one model's degraded output. Only 16 representable values, so FP4 is never used alone: weights are stored in small blocks that share a scale factor, and the two competing formats below differ exactly in how that block scaling works.
+- **[MXFP4](https://arxiv.org/abs/2310.10537)** — the open **OCP Microscaling (MX)** standard: blocks of 32 values sharing one **E8M0** scale (8-bit, exponent-only — powers of two). Cross-vendor: supported on NVIDIA Blackwell *and* AMD hardware.
+- **[NVFP4](https://arxiv.org/abs/2509.25149)** — NVIDIA's own variant, Blackwell-only: smaller blocks of 16 values with a finer FP8 (E4M3) scale, plus a per-tensor FP32 scale on top. The finer/smaller-block scaling tracks outliers better, so it usually loses less quality than MXFP4 — at slightly more storage overhead.
 - **INT8 / INT4** — 8-/4-bit integers.
 - **W4A16 / W8A8** — shorthand: **W**eights in 4-bit, **A**ctivations in 16-bit, etc.
-- **E8M0** — an 8-bit exponent-only scale format used inside MXFP4.
 
 **[GGUF](https://github.com/ggml-org/ggml/blob/master/docs/gguf.md) quant types (Q4_0, Q4_1, Q4_K_M, Q8_0, IQ2_XS, …)** — The naming scheme for quantization levels of GGUF files (llama.cpp / Ollama). Reading the name: `Q<bits>_<variant>` — the number is bits per weight, the suffix is *how* the scaling works:
 - **Q4_0 / Q5_0 / Q8_0** — the original ("legacy") scheme: weights are grouped in blocks of 32, each block stores one scale factor. Simple, slightly lossier.
