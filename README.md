@@ -155,7 +155,7 @@ Rule of thumb: higher number = better quality + bigger file; at equal bits, IQ >
 
 **Calibration** — For post-training quantization: running sample data through the model to choose good scaling factors. Bad calibration → subtle quality bugs (e.g. a "miscalibrated logit tail" at temperature 1.0).
 
-**Quantization toolkits/formats** — **compressed-tensors (`-ct`)** (checkpoint format used by RedHatAI et al.), **AutoRound** (Intel), **[AWQ](https://arxiv.org/abs/2306.00978)**, **[GPTQ](https://arxiv.org/abs/2210.17323)**, **llm-compressor**, **modelopt** (NVIDIA TensorRT ModelOpt), **GGUF** (llama.cpp's file format — see the GGUF quant types above).
+**Quantization toolkits/formats** — **[compressed-tensors](https://github.com/vllm-project/compressed-tensors) (`-ct`)** (checkpoint format used by RedHatAI et al.), **[AutoRound](https://github.com/intel/auto-round)** (Intel), **[AWQ](https://arxiv.org/abs/2306.00978)**, **[GPTQ](https://arxiv.org/abs/2210.17323)**, **[llm-compressor](https://github.com/vllm-project/llm-compressor)**, **[modelopt](https://github.com/NVIDIA/TensorRT-Model-Optimizer)** (NVIDIA TensorRT Model Optimizer — what NVIDIA's own NVFP4/FP8 checkpoints on HuggingFace are made with), **GGUF** (llama.cpp's file format — see the GGUF quant types above).
 
 ---
 
