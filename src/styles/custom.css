@@ -1,0 +1,4 @@
+/* Let content use the full viewport instead of Starlight's centered column. */
+:root {
+  --sl-content-width: 100%;
+}

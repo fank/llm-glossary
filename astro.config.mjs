@@ -12,6 +12,7 @@ export default defineConfig({
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/fank/llm-glossary' },
       ],
+      customCss: ['./src/styles/custom.css'],
       editLink: {
         baseUrl: 'https://github.com/fank/llm-glossary/edit/main/',
       },
