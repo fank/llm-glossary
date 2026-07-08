@@ -77,9 +77,9 @@ Organized by topic; use Ctrl+F to look up a term. Synonyms and abbreviations are
 
 ## 3. How inference works (prefill, decode, caching)
 
-**Prefill** — Phase 1 of answering a request: the engine processes the entire prompt in one (parallel) pass. Compute-heavy; determines how long you wait for the first word.
+**Prefill** — Phase 1 of answering a request: the engine processes the entire prompt in one (parallel) pass. Determines how long you wait for the first word. **Compute-bound**: speed scales with the GPU's raw math throughput (TFLOPS spec), because all prompt tokens are crunched in parallel.
 
-**Decode** — Phase 2: generating the answer one token at a time. Memory-bandwidth-heavy; determines how fast the words stream out.
+**Decode** — Phase 2: generating the answer one token at a time. Determines how fast the words stream out. **Memory-bandwidth-bound**: for every single token, all model weights must be re-read from GPU memory, so speed scales with the memory-bandwidth spec (GB/s), not compute. This is why a GPU with fast HBM decodes much faster than a unified-memory box (see section 8) even at similar compute, and why quantization speeds up decode — fewer bytes to read per token.
 
 **TTFT (Time To First Token)** — How long from sending the request until the first token of the answer arrives ≈ prefill time. The dominant latency for long agent-style prompts ("0.6s at empty context → 37s at 32k").
 
