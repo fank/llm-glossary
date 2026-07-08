@@ -2,6 +2,8 @@
 title: "Common vLLM flags (quick reference)"
 ---
 
+Full reference: [vLLM engine arguments](https://docs.vllm.ai/en/latest/configuration/engine_args/).
+
 | Flag | Meaning |
 |---|---|
 | `--tensor-parallel-size` | Split the model across N GPUs (TP) |

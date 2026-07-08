@@ -2,7 +2,7 @@
 title: "LLM basics"
 ---
 
-**LLM (Large Language Model)** — A neural network trained on huge amounts of text that generates text one small piece (token) at a time. Self-hosting means running ("serving") such models on your own hardware instead of using a cloud API.
+**[LLM](https://arxiv.org/abs/2005.14165) (Large Language Model)** — A neural network trained on huge amounts of text that generates text one small piece (token) at a time. Self-hosting means running ("serving") such models on your own hardware instead of using a cloud API.
 
 **Token** — The unit an LLM reads and writes. Roughly a word fragment: ~3–4 characters of English on average. "128K context" means the model can consider ~128,000 tokens of input at once. Speeds are measured in **tok/s** (tokens per second).
 
@@ -14,10 +14,10 @@ title: "LLM basics"
 
 **Serving** — Running a model behind an API so applications can send requests to it.
 
-**Weights / parameters (params)** — The learned numbers that make up a model. "31B" = 31 billion parameters. More parameters ≈ more capable but needs more memory and compute.
+**[Weights / parameters](https://arxiv.org/abs/2001.08361) (params)** — The learned numbers that make up a model. "31B" = 31 billion parameters. More parameters ≈ more capable but needs more memory and compute.
 
 **Checkpoint** — A saved copy of a model's weights, usually downloaded from HuggingFace.
 
-**Sampling / sampling parameters** — How the model picks the next token from its probability distribution. **temperature** (higher = more random), **top_p** / **top_k** (restrict choices to the most likely tokens), **greedy** (always pick the single most likely token — deterministic).
+**[Sampling / sampling parameters](https://arxiv.org/abs/1904.09751)** — How the model picks the next token from its probability distribution. **temperature** (higher = more random), **top_p** / **top_k** (restrict choices to the most likely tokens), **greedy** (always pick the single most likely token — deterministic).
 
 **Logits** — The raw scores the model assigns to every possible next token before they're turned into probabilities.
