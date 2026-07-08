@@ -1,16 +1,16 @@
 ---
-title: "Platform (PCAI / Kubernetes)"
+title: "Deployment & platform (Docker / Kubernetes)"
 ---
 
-**HPE PCAI (Private Cloud AI)** — HPE's on-prem AI appliance: a managed Kubernetes cluster with a model-serving layer. Typically locked-down (limited volume mounts, pod logs, SSH).
+**Docker / container** — The standard way to package and run inference engines: the engine, its CUDA libraries, and Python dependencies ship as one **image** (e.g. `vllm/vllm-openai`), so nothing has to be installed on the host except the GPU driver. **docker compose** describes multi-container setups (engine + proxy + monitoring) in one file.
 
-**Kubernetes (K8s)** — The container-orchestration system underneath. Relevant vocabulary: **pod** (running container instance), **PVC** (persistent volume claim — a chunk of storage, e.g. for model weights), **RWX** (storage mountable by many pods at once), **hostPath** (mounting a node directory — often forbidden by cluster policy), **/dev/shm** (shared-memory filesystem pods use for inter-process communication), **CRD** (custom resource definition — a K8s API extension), **Kyverno** (a policy engine that enforces/mutates cluster rules).
+**NVIDIA Container Toolkit (`--gpus all`)** — The bridge that lets containers see the host's GPUs. Without it a container has no GPU access; version mismatches between host driver and image CUDA are a classic startup failure.
 
-**[KServe](https://kserve.github.io/website/)** — The model-serving framework on PCAI. An **InferenceService (isvc)** is one deployed model (with its URL and bearer-token **JWT** auth); a **ServingRuntime** defines the container/args used to run it; **autoscaling/replicas** control how many copies run.
+**Kubernetes (K8s)** — The container-orchestration system used to run serving at scale (and the base of most managed AI platforms). Relevant vocabulary: **pod** (running container instance), **PVC** (persistent volume claim — a chunk of storage, e.g. for model weights), **RWX** (storage mountable by many pods at once), **hostPath** (mounting a node directory — often forbidden by cluster policy), **/dev/shm** (shared-memory filesystem pods use for inter-process communication), **CRD** (custom resource definition — a K8s API extension), **Kyverno** (a policy engine that enforces/mutates cluster rules).
 
-**MLIS** — PCAI's model-inventory API (`/api/v1/models`). Important nuance: it lists model *definitions*, not what is actually running right now.
+**[KServe](https://kserve.github.io/website/)** — A Kubernetes model-serving framework (used by several commercial AI platforms). An **InferenceService (isvc)** is one deployed model (with its URL and bearer-token **JWT** auth); a **ServingRuntime** defines the container/args used to run it; **autoscaling/replicas** control how many copies run.
 
-**aioli** — Name/namespace of PCAI's serving stack.
+**Managed AI appliances** — Vendor products that bundle hardware + Kubernetes + a serving layer into an on-prem "private AI cloud" (e.g. HPE Private Cloud AI, Dell AI Factory, Nutanix GPT-in-a-Box). Typically locked-down: limited volume mounts, pod logs, and SSH access compared to a cluster you run yourself.
 
 **HF / HuggingFace** — The standard hub for downloading model weights (`HF_TOKEN` = auth token; **Xet** = its newer CDN download backend).
 

@@ -30,7 +30,7 @@ export default defineConfig({
         { label: 'Tokens, templates & parsing', slug: 'tokens-templates-parsing' },
         { label: 'Embeddings & RAG', slug: 'embeddings-rag' },
         { label: 'Serving engines & runtimes', slug: 'serving-engines' },
-        { label: 'Platform (PCAI / Kubernetes)', slug: 'platform' },
+        { label: 'Deployment & platform', slug: 'platform' },
         { label: 'Monitoring & benchmarking', slug: 'monitoring-benchmarking' },
         { label: 'Common vLLM flags', slug: 'vllm-flags' },
       ],
