@@ -16,6 +16,7 @@ Plain-language explanations of terminology from the world of self-hosted LLM inf
 - [GPU hardware](https://fank.github.io/llm-glossary/gpu-hardware/)
 - [Tokens, templates & parsing](https://fank.github.io/llm-glossary/tokens-templates-parsing/)
 - [Embeddings & RAG](https://fank.github.io/llm-glossary/embeddings-rag/)
+- [Speech (TTS / ASR)](https://fank.github.io/llm-glossary/speech/)
 - [Serving engines & runtimes](https://fank.github.io/llm-glossary/serving-engines/)
 - [Deployment & platform (Docker / Kubernetes)](https://fank.github.io/llm-glossary/platform/)
 - [Monitoring & benchmarking](https://fank.github.io/llm-glossary/monitoring-benchmarking/)

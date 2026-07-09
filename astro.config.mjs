@@ -29,6 +29,7 @@ export default defineConfig({
         { label: 'GPU hardware', slug: 'gpu-hardware' },
         { label: 'Tokens, templates & parsing', slug: 'tokens-templates-parsing' },
         { label: 'Embeddings & RAG', slug: 'embeddings-rag' },
+        { label: 'Speech (TTS / ASR)', slug: 'speech' },
         { label: 'Serving engines & runtimes', slug: 'serving-engines' },
         { label: 'Deployment & platform', slug: 'platform' },
         { label: 'Monitoring & benchmarking', slug: 'monitoring-benchmarking' },
