@@ -29,6 +29,8 @@ title: "Model architecture"
 
 **[GDN](https://arxiv.org/abs/2412.06464) (Gated DeltaNet)** — Qwen's hybrid linear-attention/recurrent layer type (used in ~75% of Qwen3.5/3.6 layers). Like SSMs, it carries a running state — which has practical consequences: the state can't be checkpointed per token, so features like prefix caching and speculative-decoding rollback don't work naturally with it.
 
+**Diffusion LM (dLLM) / text diffusion** — An alternative to left-to-right generation: the model starts from a fully masked/noisy block of text and refines it over several "denoising" steps, filling in whole passages in parallel (same idea as image diffusion). Promises much faster generation; used both for full models and as a drafting trick (see DFlash under [Speculative decoding](../speculative-decoding/)).
+
 **Encoder / decoder** — Two transformer flavors. *Decoders* generate text left-to-right (all chat LLMs). *Encoders* read the whole input at once and output a representation (classic for embeddings, e.g. BERT-style). Matters for embedding models: decoder-based embedders need **last-token pooling** (take the representation of the final token), encoders typically use mean/CLS pooling.
 
 **lm-head** — The model's final layer that converts its internal representation into scores over the vocabulary (i.e. "which token comes next"). Sometimes quantized separately.
