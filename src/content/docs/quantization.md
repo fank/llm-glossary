@@ -10,6 +10,7 @@ title: "Quantization (making models smaller)"
 - **FP4 (e2m1)** — 4-bit float; e2m1 is the bit layout (2 exponent, 1 mantissa bit). Very small, but quality risk is significant — blamed for one model's degraded output. Only 16 representable values, so FP4 is never used alone: weights are stored in small blocks that share a scale factor, and the two competing formats below differ exactly in how that block scaling works.
 - **[MXFP4](https://arxiv.org/abs/2310.10537)** — the open **OCP Microscaling (MX)** standard: blocks of 32 values sharing one **E8M0** scale (8-bit, exponent-only — powers of two). Cross-vendor: supported on NVIDIA Blackwell *and* AMD hardware.
 - **[NVFP4](https://arxiv.org/abs/2509.25149)** — NVIDIA's own variant, Blackwell-only: smaller blocks of 16 values with a finer FP8 (E4M3) scale, plus a per-tensor FP32 scale on top. The finer/smaller-block scaling tracks outliers better, so it usually loses less quality than MXFP4 — at slightly more storage overhead.
+- **[Ternary / 1.58-bit / BitNet](https://arxiv.org/abs/2402.17764)** — the extreme end: every weight is just −1, 0, or +1 (log₂3 ≈ 1.58 bits of information). Requires training the model that way from the start; rewards are tiny files and multiplication-free inference.
 - **[INT8 / INT4](https://arxiv.org/abs/2004.09602)** — 8-/4-bit integers.
 - **W4A16 / W8A8** — shorthand: **W**eights in 4-bit, **A**ctivations in 16-bit, etc.
 
@@ -21,7 +22,7 @@ title: "Quantization (making models smaller)"
 
 Rule of thumb: higher number = better quality + bigger file; at equal bits, IQ > K > _1 > _0 in quality. Q8_0 is near-lossless; Q4_K_M is the typical quality/size compromise; below Q3 expect visible degradation.
 
-**QAT (Quantization-Aware Training)** — The model was *trained* knowing it would be quantized, so the quantized version loses much less quality (e.g. [Gemma](https://arxiv.org/abs/2607.02770)'s QAT checkpoints).
+**QAT (Quantization-Aware Training)** — The model was *trained* knowing it would be quantized, so the quantized version loses much less quality (e.g. [Gemma](https://arxiv.org/abs/2607.02770)'s QAT checkpoints). Naming pattern worth decoding: a repo called `…-qat-q4_0-unquantized` is not a contradiction — it holds the *full-precision* weights that came out of a QAT run targeting `q4_0`, published so you can do the final quantization to that format yourself.
 
 **[Calibration](https://arxiv.org/abs/2311.09755)** — For post-training quantization: running sample data through the model to choose good scaling factors. Bad calibration → subtle quality bugs (e.g. a "miscalibrated logit tail" at temperature 1.0).
 
