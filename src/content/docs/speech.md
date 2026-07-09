@@ -6,7 +6,7 @@ Speech models are the other thing (besides [embeddings](../embeddings-rag/)) com
 
 **TTS (Text-To-Speech; speech synthesis, voice synthesis)** — Generating spoken audio from text. Modern local TTS models are often small (1–8B) and run on the same GPU infrastructure as LLMs.
 
-**STT / ASR (Speech-To-Text / Automatic Speech Recognition)** — Transcribing audio to text. The two abbreviations mean the same thing; papers say ASR, products say STT.
+**STT / ASR (Speech-To-Text / Automatic Speech Recognition; transcription)** — Transcribing audio to text. The two abbreviations mean the same thing; papers say ASR, products say STT or simply "transcription".
 
 **[Whisper](https://arxiv.org/abs/2212.04356)** — OpenAI's open-weights ASR family; the de-facto standard for local transcription. Like llama.cpp for LLMs, it has optimized runtimes: **[faster-whisper](https://github.com/SYSTRAN/faster-whisper)** (CTranslate2-based) and **[whisper.cpp](https://github.com/ggml-org/whisper.cpp)** (C++, great on CPU/Apple Silicon).
 
