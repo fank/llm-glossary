@@ -12,6 +12,8 @@ title: "Monitoring & benchmarking"
 
 **Throughput vs latency** — Throughput = total tok/s the box can produce across all users; latency = how fast one user's request completes. Optimizing one often hurts the other.
 
+**Interleaved A/B (benchmark variance)** — Restart-to-restart throughput of the same setup can vary ±20% (clocks, memory layout, cache state), so "before" and "after" numbers from different server starts mostly measure noise. Valid comparisons interleave both variants on a single running instance.
+
 **Wall-clock** — Real elapsed time (as opposed to a per-step or per-token rate).
 
 **[HumanEval](https://arxiv.org/abs/2107.03374) / [MMLU](https://arxiv.org/abs/2009.03300) / perplexity** — Model-*quality* measures: a code-generation benchmark, a broad knowledge exam, and a statistical "how surprised is the model by real text" score (lower = better). Used to check that quantization/upgrades didn't hurt quality.

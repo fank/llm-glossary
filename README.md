@@ -21,7 +21,6 @@ Plain-language explanations of terminology from the world of self-hosted LLM inf
 - [Deployment & platform (Docker / Kubernetes)](https://fankserver.github.io/llm-glossary/platform/)
 - [Monitoring & benchmarking](https://fankserver.github.io/llm-glossary/monitoring-benchmarking/)
 - [Common vLLM flags](https://fankserver.github.io/llm-glossary/vllm-flags/)
-- [Serving pitfalls (field notes)](https://fankserver.github.io/llm-glossary/serving-pitfalls/)
 
 Synonyms and abbreviations are listed in parentheses. Terms link to a primary source (paper, spec, or docs) where one exists.
 
