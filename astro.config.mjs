@@ -3,18 +3,18 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-  site: 'https://fank.github.io',
+  site: 'https://fankserver.github.io',
   base: '/llm-glossary',
   integrations: [
     starlight({
       title: 'LLM Serving Glossary',
       description: 'Plain-language glossary of LLM & inference-serving terminology',
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/fank/llm-glossary' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/fankserver/llm-glossary' },
       ],
       customCss: ['./src/styles/custom.css'],
       editLink: {
-        baseUrl: 'https://github.com/fank/llm-glossary/edit/main/',
+        baseUrl: 'https://github.com/fankserver/llm-glossary/edit/main/',
       },
       lastUpdated: true,
       sidebar: [
