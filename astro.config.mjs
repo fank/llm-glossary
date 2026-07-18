@@ -34,6 +34,7 @@ export default defineConfig({
         { label: 'Deployment & platform', slug: 'platform' },
         { label: 'Monitoring & benchmarking', slug: 'monitoring-benchmarking' },
         { label: 'Common vLLM flags', slug: 'vllm-flags' },
+        { label: 'Field notes: gfx906', slug: 'field-notes-gfx906' },
       ],
     }),
   ],
