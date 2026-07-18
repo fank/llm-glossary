@@ -14,4 +14,6 @@ title: "Tokens, templates & parsing"
 
 **DSML** — DeepSeek's proprietary markup language for tool calls inside its raw output (tags like `<｜DSML｜…>`). The parser must strip it; a known bug leaked close-tags into tool arguments.
 
+**[FIM](https://arxiv.org/abs/2207.14255) (Fill-In-the-Middle)** — Code models are trained to complete a gap *between* a prefix and a suffix (not just continue left-to-right), controlled by special FIM tokens (`<|fim_prefix|>`, `<|fim_suffix|>`, `<|fim_middle|>`-style). This is what powers editor autocompletion; serving it means sending those tokens in the right order per model.
+
 **[Structured output](https://platform.openai.com/docs/guides/structured-outputs)** — Constraining the model to emit valid JSON matching a schema.

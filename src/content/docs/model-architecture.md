@@ -11,7 +11,7 @@ title: "Model architecture"
 **[MoE](https://arxiv.org/abs/1701.06538) (Mixture of Experts)** — An architecture where the model contains many small sub-networks ("experts") and a router activates only a few per token. This is why you see two sizes: "284B total / 13B active" means the model has 284B parameters on disk/in memory, but only ~13B do work per token — so it's much faster than a dense 284B model. Written as suffixes like `-A10B` ("10B active").
 
 - **[Routed / shared experts](https://arxiv.org/abs/2401.06066)** — Routed experts are chosen per token by the router; shared experts always run.
-- **Expert routing / auxiliary-loss-free routing** (`noaux_tc`, `e_score_correction_bias`, `topk_method`, `scoring_func`) — Config knobs describing *how* the router picks experts (DeepSeek-V3 style). Only matters when a bad config breaks model loading.
+- **Expert routing / auxiliary-loss-free routing** (`noaux_tc`, `e_score_correction_bias`, `topk_method`, `scoring_func`) — Config knobs describing *how* the router picks experts (DeepSeek-V3 style). Only matters when a bad config breaks model loading. **Hash routing** = the expert is picked by token ID instead of a learned router (used in some early layers: cheap, stable per-token paths).
 
 **[MLA](https://arxiv.org/abs/2405.04434) (Multi-head Latent Attention)** — DeepSeek's attention variant that stores a *compressed* version of the attention cache, making long contexts use far less GPU memory (e.g. 122K tokens of context in ~11 GiB instead of many times that).
 
@@ -23,7 +23,11 @@ title: "Model architecture"
 
 **[SWA](https://arxiv.org/abs/2004.05150) (Sliding-Window Attention)** — Attention limited to a fixed window of recent tokens (e.g. `sliding_window=128`) instead of the whole context. Cheap, but the layer can't see far back; models mix SWA layers with full-attention layers.
 
-**c4a / c128a** — Shorthand in DeepSeek-V4 for compressed global-attention layers with a per-layer KV compression ratio of 4 or 128 (higher = more compressed = cheaper).
+**CSA (Compressed Sparse Attention)** — DeepSeek-V4's attention for mid-range memory: every 4 tokens are *learned-compressed* into one KV entry (the model learns how much each token contributes), then a Lightning-Indexer-style top-k selection (as in DSA) picks only the most relevant compressed blocks to attend to. Compression + sparse retrieval.
+
+**HCA (Heavily Compressed Attention)** — The long-range companion: every 128 tokens become one KV entry (32× lighter than CSA), and the model attends *densely* over that heavily compressed memory — a cheap global view rather than precise retrieval. V4 interleaves CSA and HCA layers 1:1, each with an extra 128-token sliding-window branch so the newest tokens are never summarized away. The shorthands **c4a / c128a** refer to these compression ratios. Note: attention cost still grows quadratically, just much slower — this is not linear attention.
+
+**MHC (Manifold-Constrained [Hyper-Connections](https://arxiv.org/abs/2409.19606))** — A change to the transformer's residual stream (the "conveyor belt" carrying information between layers): instead of one stream, several parallel streams with learned mixing before/after each layer, increasing representational capacity across depth.
 
 **SSM (State-Space Model) / [Mamba](https://arxiv.org/abs/2312.00752) / [Mamba-2](https://arxiv.org/abs/2405.21060)** — An alternative to attention: instead of looking back at all tokens, the layer maintains a running "hidden state" that is updated token by token (like a summary it carries forward). Much cheaper for long contexts. "**[Hybrid](https://arxiv.org/abs/2403.19887)**" models interleave Mamba/SSM layers with attention layers.
 
