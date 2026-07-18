@@ -11,13 +11,13 @@ Common methods:
 
 **[MTP](https://arxiv.org/abs/2404.19737) (Multi-Token Prediction)** — The drafter is a small extra layer *inside* the main model (DeepSeek ships one built-in; Gemma uses a separate `-assistant` drafter checkpoint). No separate model to manage.
 
-**[EAGLE](https://arxiv.org/abs/2401.15077) / EAGLE3** — A popular family of trained drafter heads that reuse the big model's internal states to draft accurately.
+**[EAGLE](https://arxiv.org/abs/2401.15077) / [EAGLE3](https://arxiv.org/abs/2503.01840)** — A popular family of trained drafter heads that reuse the big model's internal states to draft accurately.
 
 **[Medusa](https://arxiv.org/abs/2401.10774)** — An older multi-head drafting method (referenced for comparison).
 
-**DFlash** — A "block-diffusion" drafter (~0.8B, from z-lab): instead of guessing tokens one by one, it drafts a whole block of tokens in a single non-causal forward pass (a "denoising step"), like filling in a whole phrase at once.
+**[DFlash](https://arxiv.org/abs/2602.06036)** — A "block-diffusion" drafter (~0.8B, from [z-lab](https://github.com/z-lab/dflash)): instead of guessing tokens one by one, it drafts a whole block of tokens in a single non-causal forward pass (a "denoising step"), like filling in a whole phrase at once.
 
-**DSpark** — DeepSeek's block-parallel drafting scheme built on the model's own MTP weights (knobs like `dspark_block_size`), used with DeepSeek-V4 models.
+**[DSpark](https://arxiv.org/abs/2607.05147)** — DeepSeek's block-parallel drafting scheme built on the model's own MTP weights (knobs like `dspark_block_size`), used with DeepSeek-V4 models. Its trick is *confidence scheduling*: draft further ahead when the drafter is confident, pull back when it isn't.
 
 **IndexCache / skip_topk** — An upstream vLLM optimization (tracked in upgrades.md) that reuses DSA's top-k token selection across compressed-attention layers instead of recomputing it.
 
