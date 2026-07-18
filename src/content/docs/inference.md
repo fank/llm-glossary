@@ -8,7 +8,7 @@ title: "How inference works (prefill, decode, caching)"
 
 **[TTFT](https://docs.nvidia.com/nim/benchmarking/llm/latest/metrics.html) (Time To First Token)** — How long from sending the request until the first token of the answer arrives ≈ prefill time. The dominant latency for long agent-style prompts ("0.6s at empty context → 37s at 32k").
 
-**TPOT (Time Per Output Token)** — Average time between output tokens during decode. Inverse of decode tok/s.
+**[TPOT](https://docs.nvidia.com/nim/benchmarking/llm/latest/metrics.html) (Time Per Output Token)** — Average time between output tokens during decode. Inverse of decode tok/s.
 
 **KV cache (key-value cache)** — During attention, the model computes "keys" and "values" for every token; caching them means each new token only does new work instead of recomputing the whole context. This cache is the main consumer of GPU memory at long contexts — hence all the tricks (MLA, GQA, fp8 KV) to shrink it. `--kv-cache-dtype fp8` stores it in 8-bit to halve its size.
 
@@ -22,7 +22,7 @@ title: "How inference works (prefill, decode, caching)"
 
 **[Continuous batching](https://www.usenix.org/conference/osdi22/presentation/yu)** — The engine dynamically packs many concurrent requests into each GPU step, adding/removing requests on the fly (rather than waiting for a batch to fill). `--max-num-seqs` caps concurrent requests (llama.cpp's counterparts: `-b` = logical batch size, `-ub` = the physical micro-batch ("ubatch") actually run per GPU pass). "**Single-stream**" benchmarks use concurrency = 1 (one request at a time) to measure best-case latency.
 
-**Streaming / deltas** — Sending the answer to the client incrementally as it's generated (what makes chat UIs "type"). Each increment is a *delta*. Speculative decoding can emit several tokens per delta ("multi-token deltas"), which broke older parsers. `stream_options: {include_usage}` asks for token counts at the end of a stream.
+**[Streaming](https://platform.openai.com/docs/guides/streaming-responses) / deltas** — Sending the answer to the client incrementally as it's generated (what makes chat UIs "type"). Each increment is a *delta*. Speculative decoding can emit several tokens per delta ("multi-token deltas"), which broke older parsers. `stream_options: {include_usage}` asks for token counts at the end of a stream.
 
 **Async scheduling** — A vLLM scheduler mode that overlaps CPU scheduling work with GPU execution for extra throughput.
 

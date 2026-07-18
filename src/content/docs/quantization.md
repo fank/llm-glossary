@@ -24,7 +24,7 @@ title: "Quantization (making models smaller)"
 
 Rule of thumb: higher number = better quality + bigger file; at equal bits, IQ > K > _1 > _0 in quality. Q8_0 is near-lossless; Q4_K_M is the typical quality/size compromise; below Q3 expect visible degradation.
 
-**Dequantization (dequant)** — Unpacking quantized weights back to a computable format at inference time, done per matrix multiply by a GPU kernel. Its cost varies by quant type *and* GPU architecture — which is why a bigger Q8_0 can decode faster than a smaller IQ quant on hardware where the IQ dequant kernels are expensive. Benchmark quants on your own hardware; smaller ≠ faster.
+**[Dequantization](https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md) (dequant)** — Unpacking quantized weights back to a computable format at inference time, done per matrix multiply by a GPU kernel. Its cost varies by quant type *and* GPU architecture — which is why a bigger Q8_0 can decode faster than a smaller IQ quant on hardware where the IQ dequant kernels are expensive. Benchmark quants on your own hardware; smaller ≠ faster.
 
 **QAT (Quantization-Aware Training)** — The model was *trained* knowing it would be quantized, so the quantized version loses much less quality (e.g. [Gemma](https://arxiv.org/abs/2607.02770)'s QAT checkpoints). Naming pattern worth decoding: a repo called `…-qat-q4_0-unquantized` is not a contradiction — it holds the *full-precision* weights that came out of a QAT run targeting `q4_0`, published so you can do the final quantization to that format yourself.
 
