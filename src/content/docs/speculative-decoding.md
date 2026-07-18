@@ -19,6 +19,8 @@ Common methods:
 
 **[DSpark](https://arxiv.org/abs/2607.05147)** — DeepSeek's block-parallel drafting scheme built on the model's own MTP weights (knobs like `dspark_block_size`), used with DeepSeek-V4 models. Its trick is *confidence scheduling*: draft further ahead when the drafter is confident, pull back when it isn't.
 
+**[D-Cut](https://arxiv.org/abs/2607.14647)** — A fix for speculative decoding under *batching*: with many concurrent requests, verifying long drafts wastes compute on tokens that will be rejected — enough that spec decode can become slower than normal decoding. D-Cut prunes each request's verification depth adaptively (confident drafts keep more tokens, shaky ones are cut short), restoring the speed-up at high concurrency.
+
 **IndexCache / skip_topk** — An upstream vLLM optimization (tracked in upgrades.md) that reuses DSA's top-k token selection across compressed-attention layers instead of recomputing it.
 
 **QAT-matched drafter** — A drafter quantized/trained to match the quantized main model, so acceptance doesn't drop.
