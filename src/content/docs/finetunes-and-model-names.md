@@ -6,6 +6,10 @@ HuggingFace is full of community models with long, keyword-stacked names. The pa
 
 **Base model** — The original model everything else is derived from. Community models almost always name their base first, because that determines architecture, tokenizer, and rough capability.
 
+**Open-weight vs. fully open** — "Open-weight" means only the trained weights are published (Llama, Qwen, Mistral) — you can run and fine-tune the model but not reproduce it. "Fully open" (Olmo, Apertus, Soofi) additionally releases the training data recipe, training code, and intermediate checkpoints, so a third party can audit or rebuild the run. Model cards and papers use the distinction precisely; marketing often blurs both into "open source".
+
+**Sovereign model / sovereign AI** — A model trained end-to-end on domestic infrastructure under local (usually European) data-protection and operational rules, typically with publicly documented data — e.g. Apertus (Switzerland), Teuken/Soofi (Germany), EuroLLM. The label is about who controls the training pipeline and where it ran, not about architecture or quality.
+
 **Fine-tune / finetune** — Taking a base model and training it further on extra data to change its behavior (coding, roleplay, a specific style). Cheap compared to training from scratch; the vast majority of HuggingFace uploads are fine-tunes. Flavors you'll see in cards: **[SFT](https://arxiv.org/abs/2109.01652)** (supervised fine-tuning — train on example conversations), **[DPO](https://arxiv.org/abs/2305.18290)/RLHF/GRPO** (preference tuning — train on "this answer is better than that one").
 
 **[LoRA](https://arxiv.org/abs/2106.09685) / [QLoRA](https://arxiv.org/abs/2305.14314)** — The cheap way to fine-tune: instead of updating all weights, train a small "adapter" bolted onto them (QLoRA = doing that on top of a quantized model, so it fits on consumer GPUs). Adapters can be shipped separately (a few hundred MB) or merged into the weights before upload.
