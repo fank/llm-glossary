@@ -26,6 +26,6 @@ title: "How inference works (prefill, decode, caching)"
 
 **Async scheduling** — A vLLM scheduler mode that overlaps CPU scheduling work with GPU execution for extra throughput.
 
-**CPU offloading / hybrid CPU-GPU inference** — Running part of a too-big model from system RAM/CPU. Classically layer-granular (llama.cpp's `-ngl` = how many layers go to GPU); newer systems ([ATSInfer](https://arxiv.org/abs/2607.10183)) schedule per *tensor* and adapt to load. Always slower than all-on-GPU — PCIe bandwidth is the ceiling.
+**CPU offloading / hybrid CPU-GPU inference** — Running part of a too-big model from system RAM/CPU. Classically layer-granular (llama.cpp's `-ngl` = how many layers go to GPU); newer systems (**[ATSInfer](https://arxiv.org/abs/2607.10183)**) schedule per *tensor* and adapt to load. Always slower than all-on-GPU — PCIe bandwidth is the ceiling.
 
 **OOM / OOMKill (Out Of Memory)** — The GPU (or the container) ran out of memory and the process died — the classic failure when the KV cache, model, and overhead don't fit. `--gpu-memory-utilization` sets what fraction of GPU memory vLLM may claim; `--max-model-len` caps context length to bound the cache; "headroom" = memory left free as safety margin.
