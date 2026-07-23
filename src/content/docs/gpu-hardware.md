@@ -10,6 +10,8 @@ title: "GPU hardware"
 
 **VRAM** — GPU memory. Everything (weights + KV cache + overhead) must fit in it.
 
+**[UMA](https://www.nvidia.com/en-us/products/workstations/dgx-spark/) (Unified Memory Architecture)** — The CPU and GPU share one physical memory pool instead of separate system RAM and VRAM. Weights, [KV cache](../inference/), and temporary [prefill](../inference/) allocations all draw from it, so a large prefill can exhaust the headroom left by `GMU 0.85` and OOM an already-resident session.
+
 **HBM / HBM3 (High-Bandwidth Memory)** — The very fast memory stacked on datacenter GPUs. Decode speed is usually limited by how fast weights can be read from it ("memory-bandwidth-bound" / the "memory-bandwidth floor").
 
 **[NVLink](https://www.nvidia.com/en-us/data-center/nvlink/) / NVLink bridge** — NVIDIA's fast GPU-to-GPU interconnect (~600 GB/s vs ~64 GB/s over **PCIe**, the standard slot connection). Determines whether tensor parallelism is fast or crippled.
