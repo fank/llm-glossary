@@ -22,6 +22,6 @@ title: "LLM basics"
 
 **Midtraining / context extension** — Training phases between pretraining and post-training: continued training on curated data (math/code/long documents) while progressively extending the context window (e.g. 32K → 128K → 256K). Model cards often report these phases separately from the main pretraining token count.
 
-**[Sampling / sampling parameters](https://arxiv.org/abs/1904.09751)** — How the model picks the next token from its probability distribution. **temperature** (higher = more random), **top_p** / **top_k** (restrict choices to the most likely tokens), **greedy** (always pick the single most likely token — deterministic).
+**[Sampling / sampling parameters](https://arxiv.org/abs/1904.09751)** — How the model picks the next token from its probability distribution. **temperature** (higher = more random), **top_p** / **top_k** (restrict choices to the most likely tokens), **greedy** (always pick the single most likely token — deterministic). Models ship recommended defaults in **`generation_config.json`**; vLLM's `--override-generation-config` patches them server-side (e.g. `{"temperature": 0.7, "top_p": 0.95}`) so clients that send no sampling params still get the model's intended settings.
 
 **Logits** — The raw scores the model assigns to every possible next token before they're turned into probabilities.

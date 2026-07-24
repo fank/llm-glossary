@@ -19,6 +19,7 @@ Full reference: [vLLM engine arguments](https://docs.vllm.ai/en/latest/configura
 | `--trust-remote-code` | Allow running model-supplied Python code (needed by some architectures) |
 | `--served-model-name` | The model name clients use in API calls |
 | `--hf-overrides` | Patch fields in the model's HF config at load time |
+| `--override-generation-config` | Patch the model's default sampling params (temperature, top_p, …) |
 | `--tool-call-parser` / `--reasoning-parser` | Which parser converts the model's raw markup into API fields |
 | `--attention-backend` | Which attention kernel library to use |
 | `--language-model-only` | Skip loading the vision part of a multimodal model |

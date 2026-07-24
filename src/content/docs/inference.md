@@ -28,4 +28,6 @@ title: "How inference works (prefill, decode, caching)"
 
 **CPU offloading / hybrid CPU-GPU inference** — Running part of a too-big model from system RAM/CPU. Classically layer-granular (llama.cpp's `-ngl` = how many layers go to GPU); newer systems (**[ATSInfer](https://arxiv.org/abs/2607.10183)**) schedule per *tensor* and adapt to load. Always slower than all-on-GPU — PCIe bandwidth is the ceiling.
 
+**GMU (GPU memory utilization)** — Shorthand for vLLM's `--gpu-memory-utilization`: the fraction of GPU memory (e.g. 0.85) vLLM pre-allocates for weights + KV cache + activations. Higher = more KV cache = more concurrent requests, but less headroom for spikes (CUDA graphs, NCCL buffers) — set it too high and you OOM at startup or under load.
+
 **OOM / OOMKill (Out Of Memory)** — The GPU (or the container) ran out of memory and the process died — the classic failure when the KV cache, model, and overhead don't fit. `--gpu-memory-utilization` sets what fraction of GPU memory vLLM may claim; `--max-model-len` caps context length to bound the cache; "headroom" = memory left free as safety margin.
